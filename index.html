@@ -17,6 +17,7 @@
       top: 180px;
       bottom: 0;
       width: 100%;
+      transition: top 0.3s ease;
     }
     #header {
       position: absolute;
@@ -32,6 +33,13 @@
       align-items: center;
       height: 180px;
       overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    #header.hidden {
+      transform: translateY(-100%);
+    }
+    #map.full {
+      top: 0;
     }
     .title {
       font-size: 30px;
@@ -69,6 +77,43 @@
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid white;
+    }
+    #toggle-header {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    #toggle-header.up {
+      transform: translateX(-50%) rotate(180deg);
+    }
+    #toggle-header-map {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 5px;
+      z-index: 1000;
+      display: none;
+      transition: transform 0.3s ease;
+    }
+    #toggle-header-map.down {
+      transform: translateX(-50%) rotate(180deg);
+    }
+    #header.hidden + #map #toggle-header-map {
+      display: block;
     }
   </style>
 </head>
@@ -126,9 +171,12 @@
         </div>
       </div>
     </div>
+    <button id="toggle-header" title="Toggle header visibility">▲</button>
   </div>
 
-  <div id="map"></div>
+  <div id="map">
+    <button id="toggle-header-map" title="Toggle header visibility">▼</button>
+  </div>
 
   <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoiNW00Y2s3NyIsImEiOiJjbWI4eXFqeDkwbzY1MmpwcDFzZDIwMmVqIn0.6JGe7JWhk28z5D3TLIJQwg';
@@ -150,6 +198,25 @@
       austin: { candidate1: 'Jim Baker', candidate2: 'Mario Cuomo' },
       phoenix: { candidate1: 'Jack Kemp', candidate2: 'Bill Clinton' }
     };
+
+    // Header toggle functionality
+    const header = document.getElementById('header');
+    const mapDiv = document.getElementById('map');
+    const toggleButton = document.getElementById('toggle-header');
+    const toggleButtonMap = document.getElementById('toggle-header-map');
+
+    function toggleHeader() {
+      header.classList.toggle('hidden');
+      mapDiv.classList.toggle('full');
+      toggleButton.classList.toggle('up');
+      toggleButtonMap.classList.toggle('down');
+      toggleButton.innerHTML = header.classList.contains('hidden') ? '▼' : '▲';
+      toggleButtonMap.innerHTML = header.classList.contains('hidden') ? '▼' : '▲';
+      map.resize(); // Ensure map resizes correctly after header toggle
+    }
+
+    toggleButton.addEventListener('click', toggleHeader);
+    toggleButtonMap.addEventListener('click', toggleHeader);
 
     map.on('load', async () => {
       try {
@@ -237,5 +304,3 @@
   </script>
 </body>
 </html>
-
-
